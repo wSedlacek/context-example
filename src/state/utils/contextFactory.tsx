@@ -10,10 +10,10 @@ interface Entity {
 export const contextFactory = <T extends Entity>() => {
   interface ContextValue {
     collection: T[];
-    add: (item: T) => void;
-    remove: (id: T['id']) => void;
-    update: (id: T['id'], item: T) => void;
-    refresh: (collection: T[]) => void;
+    add: (item: T) => Promise<void> | void;
+    remove: (id: T['id']) => Promise<void> | void;
+    update: (id: T['id'], item: T) => Promise<void> | void;
+    refresh: (collection: T[]) => Promise<void> | void;
   }
 
   const Context = React.createContext<ContextValue>(undefined as any);
@@ -24,28 +24,26 @@ export const contextFactory = <T extends Entity>() => {
     };
 
     @boundMethod
-    protected refresh(collection: T[]) {
+    protected refresh(collection: T[]): Promise<void> | void {
       this.setState({ collection });
     }
 
     @boundMethod
-    protected add(item: T) {
+    protected add(item: T): Promise<void> | void {
       this.setState({ collection: [...this.state.collection, item] });
     }
 
     @boundMethod
-    protected remove(id: T['id']) {
+    protected remove(id: T['id']): Promise<void> | void {
       this.setState({
         collection: this.state.collection.filter((item) => item.id !== id),
       });
     }
 
     @boundMethod
-    protected update(id: T['id'], item: T) {
+    protected update(id: T['id'], item: T): Promise<void> | void {
       this.setState({
-        collection: this.state.collection.map((current) =>
-          current.id === id ? item : current
-        ),
+        collection: this.state.collection.map((current) => (current.id === id ? item : current)),
       });
     }
 

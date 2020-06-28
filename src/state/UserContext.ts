@@ -16,13 +16,29 @@ class UserAPIProvider extends UserProvider {
     this.fetch().then(this.refresh);
   }
 
-  private api = 'https://dummy.restapiexample.com/api/v1/employees';
+  private api = 'http://dummy.restapiexample.com/api/v1';
 
   @boundMethod
-  private fetch() {
-    return axios
-      .get<{ data: User[] }>(`${this.api}/`)
-      .then((res) => res.data.data);
+  private async fetch() {
+    return axios.get<{ data: User[] }>(`${this.api}/employees`).then((res) => res.data.data);
+  }
+
+  @boundMethod
+  protected async remove(id: string): Promise<void> {
+    await axios.delete(`${this.api}/delete/${id}`);
+    super.remove(id);
+  }
+
+  @boundMethod
+  protected async add(item: User): Promise<void> {
+    await axios.post(`${this.api}/create`, item);
+    super.add(item);
+  }
+
+  @boundMethod
+  protected async update(id: string, item: User): Promise<void> {
+    await axios.put(`${this.api}/update/${id}`, item);
+    super.add(item);
   }
 }
 
